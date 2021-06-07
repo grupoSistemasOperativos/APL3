@@ -10,11 +10,12 @@ void reemplazar(string& palabraOculta,int pos);
 bool esLetraIngresada(string& letras,char letraBuscada);
 void limpiarPantalla();
 bool esLetra(char letra);
+bool validar(const string& letra);
 
 int main() {
     string palabra = "probando";
     string letrasIngresadas = "";
-    char letra;
+    string letra;
     int intentos = 6;
     int aciertos = 0;
     int cantCambios;
@@ -24,14 +25,16 @@ int main() {
 
     while(intentos > 0 && aciertos < palabra.size()) { 
         cout << palabraOculta << endl;
-        
-        cout << "ingrese una letra: ";
-        cin >> letra;
+        do
+        {
+            cout << "ingrese una letra: ";
+            cin >> letra;
+        } while (!validar(letra));
 
         //validar solo que es letra y no otro caracter raro
-        if( (res = esLetra(letra)) && !esLetraIngresada(letrasIngresadas,letra)) {
+        if(!esLetraIngresada(letrasIngresadas,letra.front())) {
             
-            cantCambios = buscarApariciones(palabra,palabraOculta,letra);
+            cantCambios = buscarApariciones(palabra,palabraOculta,letra.front());
             if(cantCambios > 0) {
                 aciertos += cantCambios;
             }
@@ -40,21 +43,17 @@ int main() {
                 if(intentos) {
                     cout << "la letra " << "\'" << letra << "\'" << " no se encuentra!\n"
                             "te quedan " << intentos << " vidas" << endl;
-                    limpiarPantalla();
+                    //limpiarPantalla();
                 }//el else puede que sea innecesario
                 else {
                     system("clear");
                 }
             }
         }
-        else
-            if(!res) {
-                cout << "ingrese una letra valida!" << endl;
-            }
-            else {
+        else {
                 cout << "ya ingreso esa letra!" << endl;
 
-                limpiarPantalla();
+                //limpiarPantalla();
             }
     }
 
@@ -114,4 +113,15 @@ void limpiarPantalla() {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cin.get();
     system("clear");
+}
+
+bool validar(const string& letra) {
+    
+    if(esLetra(letra.front()) && letra.size() == 1)
+        return true;
+
+    cout << "Ingrese una sola letra y que sea valida!" << endl;
+    //limpiarPantalla();
+    
+    return false;
 }
