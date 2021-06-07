@@ -26,7 +26,7 @@ int main() {
         cout << "ingrese una letra: ";
         cin >> letra;
 
-        //validar solo que es letra
+        //validar solo que es letra y no otro caracter raro
         if(!esLetraIngresada(letrasIngresadas,letra)) {
             
             cantCambios = buscarApariciones(palabra,palabraOculta,letra);
@@ -46,25 +46,6 @@ int main() {
 
             limpiarPantalla();
         }
-        // cin.ignore(INT64_MAX);
-        // cin.get();
-
-        //cout << cantCambios << endl;
-        
-            // if(!cantCambios) {
-            //     intentos--;
-            // }
-            // else {
-            //     cout << "letra ya ingresada!" << endl;
-            // }
-
-        // if(pos < palabra.size()) {
-        //     palabraOculta[pos] = palabra[pos];
-        //     reemplazar(palabra,pos);
-        //     aciertos++;
-        // }
-        // else
-        //     intentos--;
     }
 
     if(aciertos == palabra.size()) {
