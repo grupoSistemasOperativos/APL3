@@ -1,21 +1,24 @@
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <limits>
 using namespace::std;
 
 string inicializar(int cant);
-int buscarLetra(string& palabra,char letra);
+int buscarApariciones(string& palabra, string& palabraOculta, char letra);
 void reemplazar(string& palabraOculta,int pos);
+bool esLetraIngresada(string& letras,char letraBuscada);
+void limpiarPantalla();
 
 int main() {
     string palabra = "probando";
-
+    string letrasIngresadas = "";
     char letra;
     int intentos = 6;
     int aciertos = 0;
-
+    int cantCambios;
     string palabraOculta = inicializar(palabra.size());
+    system("clear");
 
     while(intentos > 0 && aciertos < palabra.size()) { 
         cout << palabraOculta << endl;
@@ -23,17 +26,45 @@ int main() {
         cout << "ingrese una letra: ";
         cin >> letra;
 
-        int pos = buscarLetra(palabra,letra);
-        //cout << pos << endl;
-        
-        if(pos < palabra.size()) {
-            palabraOculta[pos] = palabra[pos];
-            reemplazar(palabra,pos);
-            aciertos++;
-        }
+        //validar solo que es letra
+        if(!esLetraIngresada(letrasIngresadas,letra)) {
+            
+            cantCambios = buscarApariciones(palabra,palabraOculta,letra);
+            if(cantCambios > 0) {
+                aciertos += cantCambios;
+            }
+            else {
+                intentos--;
+                cout << "la letra " << "\'" << letra << "\'" << " no se encuentra!\n"
+                        "te quedan " << intentos << " vidas" << endl;
 
-        else
-            intentos--;
+                limpiarPantalla();
+            }
+        }
+        else {
+            cout << "ya ingreso esa letra!" << endl;
+
+            limpiarPantalla();
+        }
+        // cin.ignore(INT64_MAX);
+        // cin.get();
+
+        //cout << cantCambios << endl;
+        
+            // if(!cantCambios) {
+            //     intentos--;
+            // }
+            // else {
+            //     cout << "letra ya ingresada!" << endl;
+            // }
+
+        // if(pos < palabra.size()) {
+        //     palabraOculta[pos] = palabra[pos];
+        //     reemplazar(palabra,pos);
+        //     aciertos++;
+        // }
+        // else
+        //     intentos--;
     }
 
     if(aciertos == palabra.size()) {
@@ -54,13 +85,38 @@ string inicializar(int cant) {
     return palabraOculta;
 }
 
-int buscarLetra(string& palabra,char letra) {
+int buscarApariciones(string& palabra,string& palabraOculta,char letra) {
     
-    return palabra.find(letra);
+    int cantIntercambios = 0;
+
+    for (int i = 0; i < palabra.size(); i++)
+    {
+        if(palabra[i] == letra) {
+            // if(palabraOculta[i] == letra)
+            //     return -1;
+            palabraOculta[i] = letra;
+            cantIntercambios++;
+        }
+    }
+    
+    return cantIntercambios;
 }
 
-void reemplazar(string& palabra,int pos) {
+bool esLetraIngresada(string& letras,char letraBuscada) {
     
-    if(pos < palabra.size())
-        palabra.replace(pos,1,"|");
+    if(letras.find(letraBuscada) < letras.size()){
+        return true;
+    }
+
+    letras += letraBuscada;
+    return false;
+}
+
+void limpiarPantalla() {
+
+    cout << "Presione enter para continuar... " << endl;
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
+    system("clear");
 }
