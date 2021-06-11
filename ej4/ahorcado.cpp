@@ -1,11 +1,11 @@
-#include "bibliotecas.hpp"
+#include "bibliotecas.h"
 #include "SharedMemory.cpp"
 using namespace::std;
 
 string inicializar(int cant);
-int buscarApariciones(string& palabra, string& palabraOculta, char letra);
+int buscarApariciones(const char *palabra,char *palabraOculta,char letra);
 void reemplazar(string& palabraOculta,int pos);
-bool esLetraIngresada(string& letras,char letraBuscada);
+bool esLetraIngresada(char* letras,char letraBuscada);
 void limpiarPantalla();
 bool esLetra(char letra);
 bool validar(const string& letra);
@@ -13,27 +13,30 @@ string obtenerPalabraDeArchivo();
 
 int main() {
     int cantCambios;
-    
+    string letra;
     string palabra = obtenerPalabraDeArchivo();
     SharedMemory sharedMemory(palabra,inicializar(palabra.size()));
-
+    sem_t *juego = sem_open("empezarJuego", O_CREAT, 0600, 0);
     //system("clear");
     datos* datosJuego = sharedMemory.getDatos();
 
+    sem_wait(juego);
 
     while(datosJuego->intentos > 0 && datosJuego->aciertos < palabra.size()) { 
+        //cout << datosJuego->palabra << endl;
         cout << datosJuego->palabraOculta << endl;
         do
         {
             cout << "ingrese una letra: ";
-            cin >> datosJuego->letra;
-        } while (!validar(datosJuego->letra));
+            cin >> letra;
+        } while (!validar(letra));
 
-        datosJuego->letra = tolower(datosJuego->letra[0]);
+        datosJuego->letra = tolower(letra[0]);
 
-        if(!esLetraIngresada(datosJuego->letrasIngresadas,datosJuego->letra.front())) {
+        if(!esLetraIngresada(datosJuego->letrasIngresadas,datosJuego->letra)) {
             
-            cantCambios = buscarApariciones(datosJuego->palabra,datosJuego->palabraOculta,datosJuego->letra.front());
+            cantCambios = buscarApariciones(datosJuego->palabra,datosJuego->palabraOculta,datosJuego->letra);
+
             if(cantCambios > 0) {
                 datosJuego->aciertos += cantCambios;
             }
@@ -62,13 +65,15 @@ int main() {
     else {
         cout << "perdiste!" << endl << "La palabra era " << "\'" << datosJuego->palabra << "\'" << endl;
     }
+
+    return 0;
 }
 
 string obtenerPalabraDeArchivo() {
 
     fstream palabrasFile;
     srand(time(nullptr));
-    palabrasFile.open("palabras.txt",ios::in);
+    palabrasFile.open("archivosTexto/palabras.txt",ios::in);
 
     if(!palabrasFile) {
         cerr << "No se pudo abrir archivo" << endl;
@@ -95,30 +100,37 @@ string inicializar(int cant) {
     return palabraOculta;
 }
 
-int buscarApariciones(string& palabra,string& palabraOculta,char letra) {
+int buscarApariciones(const char *palabra,char *palabraOculta,char letra) {
     
     int cantIntercambios = 0;
 
-    for (int i = 0; i < palabra.size(); i++)
-    {
-        if(palabra[i] == letra) {
-            // if(palabraOculta[i] == letra)
-            //     return -1;
-            palabraOculta[i] = letra;
+    while(*palabraOculta) {
+        if(*palabra == letra) {
+            *palabraOculta = letra;
             cantIntercambios++;
         }
+        palabra++;
+        palabraOculta++;
     }
     
     return cantIntercambios;
 }
 
-bool esLetraIngresada(string& letras,char letraBuscada) {
+bool esLetraIngresada(char* letras,char letraBuscada) {
     
-    if(letras.find(letraBuscada) < letras.size()){
-        return true;
+    // if(strchr(letras,letraBuscada)) {
+    //     return true;
+    // }
+
+    while(*letras) {
+        if(*letras == letraBuscada)
+            return true;
+        letras++;
     }
 
-    letras += letraBuscada;
+    *letras = letraBuscada;
+    *(letras+1) = '\0';
+
     return false;
 }
 
@@ -128,7 +140,6 @@ bool esLetra(char letra) {
 
 void limpiarPantalla() {
 
-    
     do 
     {
         cin.clear();
