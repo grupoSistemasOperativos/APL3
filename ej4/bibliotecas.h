@@ -12,6 +12,7 @@
 #include <limits>
 #include <cstring>
 #include <semaphore.h>
+#include <signal.h>
 
 #include "structs.h"
 #include "SharedMemory.h"

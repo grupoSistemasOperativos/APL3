@@ -6,64 +6,74 @@ string inicializar(int cant);
 int buscarApariciones(const char *palabra,char *palabraOculta,char letra);
 void reemplazar(string& palabraOculta,int pos);
 bool esLetraIngresada(char* letras,char letraBuscada);
-void limpiarPantalla();
-bool esLetra(char letra);
-bool validar(const string& letra);
+void signalHandler(int sig);
 string obtenerPalabraDeArchivo();
+bool clienteEnEjecucion();
+
+string palabra = obtenerPalabraDeArchivo();
+SharedMemory sharedMemory(palabra,inicializar(palabra.size()));
+
 
 int main() {
     int cantCambios;
     string letra;
-    string palabra = obtenerPalabraDeArchivo();
-    SharedMemory sharedMemory(palabra,inicializar(palabra.size()));
+
+    sharedMemory.setPidServidor(getpid());
+    
     sem_t *juego = sem_open("empezarJuego", O_CREAT, 0600, 0);
-    //system("clear");
+    sem_t *esperarLetra = sem_open("esperarLetra", O_CREAT, 0600, 0);
+    sem_t *buscarLetra = sem_open("busquedaLetra", O_CREAT, 0600, 0);
+    sem_t *determinarResultado = sem_open("determinarResultado", O_CREAT, 0600, 0);
+    sem_t *calculoFin = sem_open("calculoFin", O_CREAT, 0600, 0);
+    
+    struct sigaction action;
+    
+    action.sa_handler = signalHandler;
+
+    sigaction(SIGINT, &action, NULL);
+    sigaction(SIGUSR1, &action, NULL);
+
+    cout << "hola" << endl;
     datos* datosJuego = sharedMemory.getDatos();
 
-    sem_wait(juego);
+    while(1) {
+        cout << "proceso con pid: " << sharedMemory.getPidServidor() << endl;
+        cout << "esperando cliente..." << endl;
+        sem_wait(juego);
+        cout << "Iniciando juego con palabra: " << palabra << endl;
 
-    while(datosJuego->intentos > 0 && datosJuego->aciertos < palabra.size()) { 
-        //cout << datosJuego->palabra << endl;
-        cout << datosJuego->palabraOculta << endl;
-        do
-        {
-            cout << "ingrese una letra: ";
-            cin >> letra;
-        } while (!validar(letra));
-
-        datosJuego->letra = tolower(letra[0]);
-
-        if(!esLetraIngresada(datosJuego->letrasIngresadas,datosJuego->letra)) {
+        while(datosJuego->intentos > 0 && datosJuego->aciertos < palabra.size()) {
             
-            cantCambios = buscarApariciones(datosJuego->palabra,datosJuego->palabraOculta,datosJuego->letra);
+            cout << "Letras ingresadas: " << datosJuego->letrasIngresadas << endl;
+            
+            sem_post(calculoFin);
+            sem_wait(esperarLetra);
 
-            if(cantCambios > 0) {
-                datosJuego->aciertos += cantCambios;
+            if(!esLetraIngresada(datosJuego->letrasIngresadas,datosJuego->letra)) {
+                cantCambios = buscarApariciones(datosJuego->palabra,datosJuego->palabraOculta,datosJuego->letra);
+
+                if(cantCambios > 0) {
+                    datosJuego->aciertos += cantCambios;
+                }
+                else {
+                    datosJuego->intentos--;
+                }
+                datosJuego->busquedaLetra = cantCambios;
             }
             else {
-                datosJuego->intentos--;
-                if(datosJuego->intentos) {
-                    cout << "la letra " << "\'" << datosJuego->letra << "\'" << " no se encuentra!\n"
-                            "te quedan " << datosJuego->intentos << " vidas" << endl;
-                    limpiarPantalla();
-                }//el else puede que sea innecesario
-                else {
-                    system("clear");
-                }
+                    datosJuego->busquedaLetra = -1;
             }
+
+            sem_post(buscarLetra);
+        }
+        
+        if(datosJuego->aciertos == palabra.size()) {
+            datosJuego->fin = 1;
         }
         else {
-                cout << "ya ingreso esa letra!" << endl;
-
-                limpiarPantalla();
-            }
-    }
-
-    if(datosJuego->aciertos == palabra.size()) {
-        cout << "ganaste!" << endl;
-    }
-    else {
-        cout << "perdiste!" << endl << "La palabra era " << "\'" << datosJuego->palabra << "\'" << endl;
+            datosJuego->fin = -1;
+        }
+        system("clear");
     }
 
     return 0;
@@ -105,8 +115,10 @@ int buscarApariciones(const char *palabra,char *palabraOculta,char letra) {
     int cantIntercambios = 0;
 
     while(*palabraOculta) {
+        //cout << *palabra << endl;
         if(*palabra == letra) {
             *palabraOculta = letra;
+            //cout << *palabraOculta << endl; 
             cantIntercambios++;
         }
         palabra++;
@@ -134,29 +146,26 @@ bool esLetraIngresada(char* letras,char letraBuscada) {
     return false;
 }
 
-bool esLetra(char letra) {
-    return (letra >= 65 && letra <= 90) || (letra >= 97 && letra <= 122);
-}
+void signalHandler(int sig) {
 
-void limpiarPantalla() {
-
-    do 
+    switch (sig)
     {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Presione enter para continuar... " << endl;
-    } while (cin.get() != '\n');
+    case SIGINT:
+            cout << "senial ignorada";
+        break;
+    case SIGUSR1:
+            if(clienteEnEjecucion()) {
+                cout << "No se puede finalizar el servidor si hay un cliente ejecutandose" << endl;
+            }
+            else {
+                cout << "Cerrando servidor..." << endl;
+                kill(getpid(),SIGTERM);
+            }
+        break;
+    }
 
-    system("clear");
 }
 
-bool validar(const string& letra) {
-    
-    if(esLetra(letra.front()) && letra.size() == 1)
-        return true;
-
-    cout << "Ingrese una sola letra y que sea valida!" << endl;
-    limpiarPantalla();
-    
-    return false;
+bool clienteEnEjecucion() {
+    return sharedMemory.getPidCliente() > 0;
 }
