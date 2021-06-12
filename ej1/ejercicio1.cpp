@@ -11,7 +11,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    int numero = *argv[1] - '0';
+    int numero = 4;//*argv[1] - '0';
     
     if (argc < 2 || argc > 3)
         return EXIT_FAILURE;
@@ -27,12 +27,13 @@ int main(int argc, char **argv)
 void generarHijos(int numero)
 {
     if (numero == 0){
-        cout<<"paso por aca - pid : "<< getpid() <<endl;
+        cout<<"El proceso "<< getpid() << " es el ultimo posible." <<endl;
         
         cout << "Presione enter para continuar... " << endl;
-        cin.get();
+        sleep(100);
+        //cin.get();
 
-        kill(getpid(),SIGKILL);
+        kill(getpid(),SIGTERM);
     }
 
     pid_t hijo1;
@@ -40,17 +41,17 @@ void generarHijos(int numero)
     
 
     hijo1 = fork();
-    if(hijo1==0)
-    cout<<"fork1- pid :"<< getpid() <<endl;
+    // if(hijo1==0)
+    // cout<<"fork1- PID: "<< getppid() << "  " << getpid() <<endl;
    
 
     pid_t hijo2 ;
 
-    if (hijo2 > 0){
+    if (hijo1 > 0){
 
         hijo2 = fork();
-        if(hijo2==0)
-        cout<<"fork2 - PID" << getpid() <<endl;
+        // if(hijo2 == 0)
+        //     cout<<"fork2 - PID: " << getppid() << "  " << getpid() <<endl;
     }
     else
     {
@@ -60,13 +61,9 @@ void generarHijos(int numero)
     if (hijo2 == 0)
         generarHijos(numero - 1);
 
-    cout << "esperado hijo 1" << endl;
     wait(NULL);
-    kill(getpid(),SIGKILL);
-    cout << "esperado hijo 2" << endl;
     wait(NULL);
-    kill(getpid(),SIGKILL);
-    cout<< "sigo con mi vida "<< endl;
+    kill(getpid(),SIGTERM);
 }
 
 /*
