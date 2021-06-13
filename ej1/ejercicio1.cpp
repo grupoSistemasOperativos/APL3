@@ -4,41 +4,38 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <limits>
+#include <vector>
 
-void generarHijos(int);
+//void generarHijos(int, vector <int> );
 
 using namespace std;
-
-int main(int argc, char **argv)
-{
-    int numero = 4;//*argv[1] - '0';
-    
-    if (argc < 2 || argc > 3)
-        return EXIT_FAILURE;
-
-    if (numero < 1)
-        return EXIT_FAILURE;
-
-    generarHijos(numero-1);
-
-    return EXIT_SUCCESS;
-}
-
-void generarHijos(int numero)
+void generarHijos(int numero,vector<int> padres)
 {
     if (numero == 0){
-        cout<<"El proceso "<< getpid() << " es el ultimo posible." <<endl;
+        cout<< numero <<" El proceso "<< getpid() << " es el ultimo posible." <<endl;
         
         cout << "Presione enter para continuar... " << endl;
-        sleep(100);
+        sleep(5);
         //cin.get();
+        cout << "Proceso " << getpid() << " Pid: ";
 
+        for (size_t i = 0; i < padres.size(); i++)
+        {
+            cout << padres[i] << ", ";
+        }
+        cout << endl;
         kill(getpid(),SIGTERM);
     }
 
     pid_t hijo1;
     
     
+    //padres.push_back((int)getpid());
+    // cout << "hola "<< endl;
+    // for (size_t i = 0; i < padres.size(); i++)
+    // {
+    //     cout << padres[i] << ", ";
+    // }
 
     hijo1 = fork();
     // if(hijo1==0)
@@ -48,23 +45,52 @@ void generarHijos(int numero)
     pid_t hijo2 ;
 
     if (hijo1 > 0){
-
         hijo2 = fork();
         // if(hijo2 == 0)
         //     cout<<"fork2 - PID: " << getppid() << "  " << getpid() <<endl;
     }
     else
     {
-        generarHijos(numero - 1);
+        padres.push_back((int)getppid());
+        generarHijos(numero - 1,padres);
     }
 
-    if (hijo2 == 0)
-        generarHijos(numero - 1);
+    if (hijo2 == 0) {
+        padres.push_back((int)getppid());
+        generarHijos(numero - 1,padres);
+    }
 
-    wait(NULL);
-    wait(NULL);
+    sleep(10);
+    waitpid(hijo1,NULL,0);
+    waitpid(hijo2,NULL,0);
+    cout << "Proceso " << getpid() << "Pid: ";
+
+    for (size_t i = 0; i < padres.size(); i++)
+    {
+        cout << padres[i] << ", ";
+    }
+
+    cout << endl;
+
     kill(getpid(),SIGTERM);
 }
+
+int main(int argc, char **argv)
+{
+    int numero = *argv[1] - '0';
+    
+    if (argc < 2 || argc > 3)
+        return EXIT_FAILURE;
+
+    if (numero < 1)
+        return EXIT_FAILURE;
+
+    vector<int> padres = {};
+    generarHijos(numero-1,padres);
+
+    return EXIT_SUCCESS;
+}
+
 
 /*
 
