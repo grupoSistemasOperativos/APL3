@@ -30,13 +30,12 @@ int main() {
     
     action.sa_handler = signalHandler;
 
-    sigaction(SIGINT, &action, NULL);
+    //sigaction(SIGINT, &action, NULL);
     sigaction(SIGUSR1, &action, NULL);
 
-    cout << "hola" << endl;
     datos* datosJuego = sharedMemory.getDatos();
 
-    while(1) {
+    while(true) {
         cout << "proceso con pid: " << sharedMemory.getPidServidor() << endl;
         cout << "esperando cliente..." << endl;
         sem_wait(juego);
@@ -73,6 +72,7 @@ int main() {
         else {
             datosJuego->fin = -1;
         }
+        datosJuego->fin = 0;
         system("clear");
     }
 
@@ -129,10 +129,6 @@ int buscarApariciones(const char *palabra,char *palabraOculta,char letra) {
 }
 
 bool esLetraIngresada(char* letras,char letraBuscada) {
-    
-    // if(strchr(letras,letraBuscada)) {
-    //     return true;
-    // }
 
     while(*letras) {
         if(*letras == letraBuscada)

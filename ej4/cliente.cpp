@@ -65,6 +65,15 @@ int main() {
         cout << "Perdiste!" << endl << "La palabra era " << "\'" << datosJuego->palabra << "\'" << endl;
     }
 
+    // sem_unlink("esperarLetra");
+    // sem_unlink("busquedaLetra");
+    // sem_unlink("determinarResultado");
+    // sem_unlink("calculoFin");
+    sem_destroy(esperarLetra);
+    sem_destroy(determinarResultado);
+    sem_destroy(buscarLetra);
+    sem_destroy(calculoFin);
+    
     return 0;
 }
 
