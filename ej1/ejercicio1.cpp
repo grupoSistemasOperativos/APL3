@@ -4,14 +4,16 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <limits>
+#include <vector>
 
-void generarHijos(int);
-
+#include "Proceso.cpp"
 using namespace std;
+
+void generarHijos(int numero,vector<int> padres,Proceso* hijo);
 
 int main(int argc, char **argv)
 {
-    int numero = 4;//*argv[1] - '0';
+    int numero = *argv[1] - '0';
     
     if (argc < 2 || argc > 3)
         return EXIT_FAILURE;
@@ -19,50 +21,65 @@ int main(int argc, char **argv)
     if (numero < 1)
         return EXIT_FAILURE;
 
-    generarHijos(numero-1);
+    vector<pid_t> padres = {};
+    generarHijos(numero-1,padres,NULL);
+
+
 
     return EXIT_SUCCESS;
 }
 
-void generarHijos(int numero)
+void generarHijos(int numero,vector<int> padres,Proceso* hijo)
 {
     if (numero == 0){
         cout<<"El proceso "<< getpid() << " es el ultimo posible." <<endl;
         
         cout << "Presione enter para continuar... " << endl;
-        sleep(100);
-        //cin.get();
+        sleep(5);
 
+        hijo->mostrar();
+        
         kill(getpid(),SIGTERM);
+        delete(hijo);
     }
 
+    padres.push_back(getpid());
+
     pid_t hijo1;
-    
-    
+    Proceso* procesoHijo1;
 
     hijo1 = fork();
-    // if(hijo1==0)
-    // cout<<"fork1- PID: "<< getppid() << "  " << getpid() <<endl;
-   
+    if(hijo1==0)
+        procesoHijo1 = new Proceso(getpid(),padres);
 
     pid_t hijo2 ;
+    Proceso* procesoHijo2;
 
     if (hijo1 > 0){
 
         hijo2 = fork();
-        // if(hijo2 == 0)
         //     cout<<"fork2 - PID: " << getppid() << "  " << getpid() <<endl;
     }
     else
     {
-        generarHijos(numero - 1);
+        generarHijos(numero - 1,padres,procesoHijo1);
     }
 
     if (hijo2 == 0)
-        generarHijos(numero - 1);
+    {
+        Proceso* procesoHijo2 = new Proceso(getpid(),padres);
+        generarHijos(numero - 1,padres,procesoHijo2);
+    }
 
     wait(NULL);
+    
     wait(NULL);
+
+    if(hijo) {
+        hijo->mostrar();
+        delete(hijo);
+    }
+
     kill(getpid(),SIGTERM);
 }
 
