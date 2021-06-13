@@ -13,18 +13,20 @@ void generarHijos(int numero,vector<int> padres,Proceso* hijo);
 
 int main(int argc, char **argv)
 {
-    int numero = *argv[1] - '0';
-    
-    if (argc < 2 || argc > 3)
+    if (argc < 2 || argc > 3) {
+        cerr << "Error, debe ingresar cantidad de niveles" << endl;
         return EXIT_FAILURE;
+    }
+
+    int numero = atoi(argv[1]);
 
     if (numero < 1)
         return EXIT_FAILURE;
 
+    cout << "Generando " << numero << " niveles" << endl;
+
     vector<pid_t> padres = {};
     generarHijos(numero-1,padres,NULL);
-
-
 
     return EXIT_SUCCESS;
 }
@@ -32,9 +34,9 @@ int main(int argc, char **argv)
 void generarHijos(int numero,vector<int> padres,Proceso* hijo)
 {
     if (numero == 0){
-        cout<<"El proceso "<< getpid() << " es el ultimo posible." <<endl;
+        //cout<<"El proceso "<< getpid() << " es el ultimo posible." <<endl;
         
-        cout << "Presione enter para continuar... " << endl;
+        //cout << "Esperando finalizacion..." << endl;
         sleep(5);
 
         hijo->mostrar();

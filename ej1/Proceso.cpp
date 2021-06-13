@@ -7,13 +7,14 @@ Proceso::Proceso(pid_t pid,vector<int> padres) {
 }
 
 void Proceso::mostrar() {
-    cout << "Proceso " << this->pid << " Pid ";
-        for (size_t i = 0; i < padres.size(); i++)
-    {
-        cout << padres[i] << ",";
-    }
+    cout << "Proceso " << this->pid << ": ";
 
-    cout << endl;
+    int i;
+    for (i = 0; i < padres.size()-1; i++)
+    {
+        cout << "Pid " << padres[i] << ",";
+    }
+    cout << "Pid " << padres[i] << endl;
 }
 
 pid_t Proceso::getPid() {
