@@ -6,112 +6,77 @@
 #include <limits>
 #include <vector>
 
-//void generarHijos(int, vector <int> );
-
+#include "Proceso.cpp"
 using namespace std;
-void generarHijos(int numero,vector<int> padres)
-{
-    if (numero == 0){
-        cout<< numero <<" El proceso "<< getpid() << " es el ultimo posible." <<endl;
-        
-        cout << "Presione enter para continuar... " << endl;
-        sleep(5);
-        //cin.get();
-        cout << "Proceso " << getpid() << " Pid: ";
 
-        for (size_t i = 0; i < padres.size(); i++)
-        {
-            cout << padres[i] << ", ";
-        }
-        cout << endl;
-        kill(getpid(),SIGTERM);
-    }
-
-    pid_t hijo1;
-    
-    
-    //padres.push_back((int)getpid());
-    // cout << "hola "<< endl;
-    // for (size_t i = 0; i < padres.size(); i++)
-    // {
-    //     cout << padres[i] << ", ";
-    // }
-
-    hijo1 = fork();
-    // if(hijo1==0)
-    // cout<<"fork1- PID: "<< getppid() << "  " << getpid() <<endl;
-   
-
-    pid_t hijo2 ;
-
-    if (hijo1 > 0){
-        hijo2 = fork();
-        // if(hijo2 == 0)
-        //     cout<<"fork2 - PID: " << getppid() << "  " << getpid() <<endl;
-    }
-    else
-    {
-        padres.push_back((int)getppid());
-        generarHijos(numero - 1,padres);
-    }
-
-    if (hijo2 == 0) {
-        padres.push_back((int)getppid());
-        generarHijos(numero - 1,padres);
-    }
-
-    sleep(10);
-    waitpid(hijo1,NULL,0);
-    waitpid(hijo2,NULL,0);
-    cout << "Proceso " << getpid() << "Pid: ";
-
-    for (size_t i = 0; i < padres.size(); i++)
-    {
-        cout << padres[i] << ", ";
-    }
-
-    cout << endl;
-
-    kill(getpid(),SIGTERM);
-}
+void generarHijos(int numero,vector<int> padres,Proceso* hijo);
 
 int main(int argc, char **argv)
 {
-    int numero = *argv[1] - '0';
-    
-    if (argc < 2 || argc > 3)
+    if (argc < 2 || argc > 3) {
+        cerr << "Error, debe ingresar cantidad de niveles" << endl;
         return EXIT_FAILURE;
+    }
 
-    if (numero < 1)
+    int numero = atoi(argv[1]);
+
+    if (numero < 1) {
         return EXIT_FAILURE;
+    }
 
-    vector<int> padres = {};
-    generarHijos(numero-1,padres);
+    cout << "Generando " << numero << " niveles" << endl;
+
+    vector<pid_t> padres = {};
+    generarHijos(numero-1,padres,NULL);
 
     return EXIT_SUCCESS;
 }
 
+void generarHijos(int numero,vector<int> padres,Proceso* hijo)
+{
+    if (numero == 0) {
+        sleep(5);
 
-/*
+        hijo->mostrar();
+        
+        kill(getpid(),SIGTERM);
+        delete(hijo);
+    }
 
-P0----*----*----  
-P2    |    `----
-P1     `---*----
-P3         `----
+    padres.push_back(getpid());
 
+    pid_t hijo1;
+    Proceso* procesoHijo1;
 
+    hijo1 = fork();
 
+    if(hijo1 == 0) {
+        procesoHijo1 = new Proceso(getpid(),padres);
+    }
 
-Caso estándar
-P0----*----------W-----X
-P1     `----X...´
+    pid_t hijo2 ;
+    Proceso* procesoHijo2;
 
-Caso demonio
-P0----*---X
-P1     `-------
+    if (hijo1 > 0) {
+        hijo2 = fork();
+    }
+    else {
+        generarHijos(numero - 1,padres,procesoHijo1);
+    }
 
-Caso zombie
-P0----*---------------X
-P1     `----X..........______  <defunct>
+    if (hijo2 == 0) {
+        Proceso* procesoHijo2 = new Proceso(getpid(),padres);
+        generarHijos(numero - 1,padres,procesoHijo2);
+    }
 
-*/
+    wait(NULL);
+    
+    wait(NULL);
+
+    if(hijo) {
+        hijo->mostrar();
+        delete(hijo);
+    }
+
+    kill(getpid(),SIGTERM);
+}
