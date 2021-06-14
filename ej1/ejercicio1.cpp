@@ -36,11 +36,13 @@ void generarHijos(int numero,vector<int> padres,Proceso* hijo)
 {
     if (numero == 0) {
         sleep(5);
-
-        hijo->mostrar();
         
-        kill(getpid(),SIGTERM);
+        if(hijo) {
+            hijo->mostrar();
+        }
+        
         delete(hijo);
+        kill(getpid(),SIGTERM);
     }
 
     padres.push_back(getpid());
@@ -75,8 +77,9 @@ void generarHijos(int numero,vector<int> padres,Proceso* hijo)
 
     if(hijo) {
         hijo->mostrar();
-        delete(hijo);
     }
+    
+    delete(hijo);
 
     kill(getpid(),SIGTERM);
 }
