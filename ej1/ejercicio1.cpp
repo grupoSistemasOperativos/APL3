@@ -5,78 +5,113 @@
 #include <sys/types.h>
 #include <limits>
 #include <vector>
+#include <string.h>
 
-#include "Proceso.cpp"
+//void generarHijos(int, vector <int> );
+int validarParametros(int, char *);
+int mostrarAyuda(int ,char *);
+
 using namespace std;
+void generarHijos(int numero, vector<int> padres)
+{
+    if (numero == 0)
+    {
 
-void generarHijos(int numero,vector<int> padres,Proceso* hijo);
+        sleep(5);
+
+        cout << "Proceso " << getpid() << " Pid: ";
+
+        for (size_t i = 0; i < padres.size(); i++)
+        {
+            cout << padres[i] << ", ";
+        }
+        cout << endl;
+        kill(getpid(), SIGTERM);
+    }
+
+    pid_t hijo1;
+    hijo1 = fork();
+
+    pid_t hijo2;
+
+    if (hijo1 > 0)
+    {
+        hijo2 = fork();
+    }
+    else
+    {
+        padres.push_back((int)getppid());
+        generarHijos(numero - 1, padres);
+    }
+
+    if (hijo2 == 0)
+    {
+        padres.push_back((int)getppid());
+        generarHijos(numero - 1, padres);
+    }
+
+    sleep(10);
+    waitpid(hijo1, NULL, 0);
+    waitpid(hijo2, NULL, 0);
+    cout << "Proceso " << getpid() << " Pid: ";
+
+    for (size_t i = 0; i < padres.size(); i++)
+    {
+        cout << padres[i] << ", ";
+    }
+
+    cout << endl;
+
+    kill(getpid(), SIGTERM);
+}
 
 int main(int argc, char **argv)
 {
-    if (argc < 2 || argc > 3) {
-        cerr << "Error, debe ingresar cantidad de niveles" << endl;
-        return EXIT_FAILURE;
-    }
+    if (mostrarAyuda(argc,argv[1]))
+    exit(0);
+    if (!validarParametros(argc, argv[1]))
+    exit(0);
+
+    
 
     int numero = atoi(argv[1]);
-
-    if (numero < 1) {
-        return EXIT_FAILURE;
-    }
-
-    cout << "Generando " << numero << " niveles" << endl;
-
-    vector<pid_t> padres = {};
-    generarHijos(numero-1,padres,NULL);
+    vector<int>padres = {};
+    generarHijos(numero - 1, padres);
 
     return EXIT_SUCCESS;
 }
 
-void generarHijos(int numero,vector<int> padres,Proceso* hijo)
+int mostrarAyuda(int cantPar,char *cad)
 {
-    if (numero == 0) {
-        sleep(5);
 
-        hijo->mostrar();
-        
-        kill(getpid(),SIGTERM);
-        delete(hijo);
+    if ((!strcmp(cad, "-h") || !strcmp(cad, "--help")) && cantPar == 2 )
+    {
+        cout << "HELP" << endl;
+        cout << "NAME" << endl;
+        cout << "    ejercicio1.exe - generar un arbol balanceado y completo de altura [NUMBER]" << endl;
+        cout << "SYNOPSIS:" << endl;
+        cout << "    ejercicio1.exe [NUMBER]  NUMBER > 0" << endl;
+        cout << "DESCRIPTION:" << endl;
+        cout << "    Muestra el arbol con altura [NUMBER], lista los pid de los hijos y sus ascendentes" << endl;
+        return 1;
+    }
+    return 0;
+}
+
+int validarParametros(int cantParam, char *cad)
+{
+
+    int numero = atoi(cad);
+    if (cantParam != 2 || numero < 1 )
+    {
+        cout << "Error de parametros" << endl;
+        cout << "Para mostrar la ayuda : ejercicio1.exe [options]" << endl;
+        cout << "options:" << endl;
+        cout << "    -h" << endl;
+        cout << "    --help" << endl;
+        return 0;
     }
 
-    padres.push_back(getpid());
 
-    pid_t hijo1;
-    Proceso* procesoHijo1;
-
-    hijo1 = fork();
-
-    if(hijo1 == 0) {
-        procesoHijo1 = new Proceso(getpid(),padres);
-    }
-
-    pid_t hijo2 ;
-    Proceso* procesoHijo2;
-
-    if (hijo1 > 0) {
-        hijo2 = fork();
-    }
-    else {
-        generarHijos(numero - 1,padres,procesoHijo1);
-    }
-
-    if (hijo2 == 0) {
-        Proceso* procesoHijo2 = new Proceso(getpid(),padres);
-        generarHijos(numero - 1,padres,procesoHijo2);
-    }
-
-    wait(NULL);
-    
-    wait(NULL);
-
-    if(hijo) {
-        hijo->mostrar();
-        delete(hijo);
-    }
-
-    kill(getpid(),SIGTERM);
+    return 1;
 }
