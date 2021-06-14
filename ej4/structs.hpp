@@ -1,5 +1,5 @@
-#ifndef STRUCTS_H
-#define STRUCTS_H
+#ifndef STRUCTS_HPP
+#define STRUCTS_HPP
 
 #include <iostream>
 using namespace std;
@@ -13,11 +13,16 @@ typedef struct {
     int aciertos;
     int busquedaLetra;
     int fin;
-}datos;
+}cadena;
 
 typedef struct {
     pid_t pidServidor;
     pid_t pidCliente;
 }pids;
+typedef struct {
+    cadena textos;
+    pids procesos;
+}datosCompartidos;
+
 
 #endif

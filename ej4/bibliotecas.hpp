@@ -1,5 +1,5 @@
-#ifndef BIBLIOTECAS_H
-#define BIBLIOTECAS_H
+#ifndef BIBLIOTECAS_HPP
+#define BIBLIOTECAS_HPP
 
 #include <iostream>
 #include <fstream>
@@ -14,7 +14,9 @@
 #include <semaphore.h>
 #include <signal.h>
 
-#include "structs.h"
-#include "SharedMemory.h"
+#include "structs.hpp"
+//#include "SharedMemory.h"
+
+#define memoriaCompartida "memoriaCompartida"
 
 #endif
