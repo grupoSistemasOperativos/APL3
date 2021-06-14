@@ -1,2 +1,2 @@
 ejecutable:
-	g++ -o ejercicio1 ejercicio1.cpp -lpthread -lrt
+	g++ -o ejercicio1.exe ejercicio1.cpp -lpthread -lrt
