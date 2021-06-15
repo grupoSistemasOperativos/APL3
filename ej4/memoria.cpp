@@ -1,9 +1,10 @@
 #include "bibliotecas.hpp"
 
-datosCompartidos* obtenerDatosCompartidos();
+memoria* obtenerDatosCompartidos();
 bool inicializarMemoria();
-void inicializarDatos(datosCompartidos* datos,const string* palabra);
-string inicializar(int cant);
+//void inicializarBuffer(bufferCompartido* buffer):
+void inicializarDatos(memoria*,int);
+string inicializar(int);
 
 bool inicializarMemoria() {
     int idMemoria = shm_open(memoriaCompartida, O_RDWR | O_CREAT | O_EXCL, 0600);
@@ -11,47 +12,42 @@ bool inicializarMemoria() {
         close(idMemoria);
         return false;
     }
-    ftruncate(idMemoria,sizeof(datosCompartidos));
+    ftruncate(idMemoria,sizeof(memoriaCompartida));
     //close(idMemoria);
     return true;
 }
 
-datosCompartidos* obtenerDatosCompartidos() {
+memoria* obtenerDatosCompartidos() {
     
     int idMemoria = shm_open(memoriaCompartida, O_CREAT | O_RDWR, 0600);
     // cout << idMemoria << endl;
     // if(idMemoria < 0)
     //     return NULL;
-    datosCompartidos* datos = (datosCompartidos *)mmap(NULL, sizeof(datosCompartidos), PROT_READ | PROT_WRITE, MAP_SHARED, idMemoria, 0);
+    memoria* mem = (memoria*)mmap(NULL, sizeof(memoria), PROT_READ | PROT_WRITE, MAP_SHARED, idMemoria, 0);
 
     //cout << "verificando si esta vacia " << datos->textos.palabra << " " << datos->textos.palabraOculta << " " << datos->textos.letrasIngresadas << endl;
 
     close(idMemoria);
     
-    return datos;
+    return mem;
 }
 
-void inicializarDatos(datosCompartidos* datos,const string* palabra) {
+void inicializarDatos(memoria* datos,int largoPalabra) {
     
     //cout << "hola" << endl;
-    memset(datos,'\0',sizeof(datosCompartidos));
+    memset(datos,'\0',sizeof(memoria));
 
-    strcpy(datos->textos.palabra,palabra->c_str());
     //cout << "hola" << endl;
-    strcpy(datos->textos.palabraOculta,inicializar(palabra->size()).c_str());
+    strcpy(datos->palabraOculta,inicializar(largoPalabra).c_str());
 
-    *(datos->textos.letrasIngresadas) = '\0';
-
-    datos->textos.intentos = 6;
-    datos->textos.aciertos = 0;
-    datos->textos.busquedaLetra = 0;
-    datos->textos.fin = 0;
+    datos->intentos = 6;
+    datos->fin = 0;
     datos->procesos.pidServidor = getpid();
     datos->procesos.pidCliente = -1;
 }
 
 void liberarMemoriaCompartida() {
-    munmap(obtenerDatosCompartidos(),sizeof(datosCompartidos));
+    munmap(obtenerDatosCompartidos(),sizeof(memoria));
     //shm_unlink(memoriaCompartida);
 }
 

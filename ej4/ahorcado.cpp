@@ -4,7 +4,8 @@
 using namespace::std;
 
 
-int buscarApariciones(const char *palabra,char *palabraOculta,char letra);
+int buscarApariciones(const string& palabra,char *palabraOculta,char letra);
+bool esLetraIngresada(string& letras,char letraBuscada);
 void reemplazar(string& palabraOculta,int pos);
 bool esLetraIngresada(char* letras,char letraBuscada);
 const string* obtenerPalabraDeArchivo();
@@ -27,13 +28,21 @@ int main() {
 
 void empezarJuego() {
 
-    int cantCambios;
-    string letra;
 
+    string letra;
+    int cantCambios;
     // struct sigaction action;
     //sigignore(SIGINT);    
     
     while(true) {
+        
+        int aciertos = 0;
+        //int letrasModificadas = 
+        int fin;
+        string letrasIngresadas = "";
+        string palabraOculta;
+        char letra;
+        
         sigemptyset(&action.sa_mask);
         action.sa_handler = signalHandler;
         
@@ -56,18 +65,18 @@ void empezarJuego() {
             exit(1);
         }
 
-        datosCompartidos* datosJuego = obtenerDatosCompartidos();
+        memoria* datosJuego = obtenerDatosCompartidos();
 
-        const string *palabraArchivo = obtenerPalabraDeArchivo();
-        if(!palabraArchivo) {
+        const string *palabra = obtenerPalabraDeArchivo();
+        if(!palabra) {
             cerr << "Archivo vacio, no es posible continuar con la ejecucion." << endl;
             datosJuego->procesos.pidCliente = -1;
             kill(datosJuego->procesos.pidServidor,SIGUSR1);
         }
 
-        inicializarDatos(datosJuego,palabraArchivo);
+        inicializarDatos(datosJuego,palabra->size());
 
-        delete(palabraArchivo);
+        //delete(palabraArchivo);
 
         cout << "Proceso con pid: " << datosJuego->procesos.pidServidor << endl;
         cout << "esperando cliente..." << endl;
@@ -78,38 +87,44 @@ void empezarJuego() {
         // cout << val << endl;
         sem_wait(juego);
         system("clear");
-        cout << "Iniciando juego con palabra: " << datosJuego->textos.palabra << endl;
+        cout << "Iniciando juego con palabra: " << *palabra << endl;
 
-        while(datosJuego->textos.intentos > 0 && datosJuego->textos.aciertos < strlen(datosJuego->textos.palabra)) {
+        while(!datosJuego->fin) {
             
-            cout << "Letras ingresadas: " << datosJuego->textos.letrasIngresadas << endl;
-            
+            cout << "Letras ingresadas: " << letrasIngresadas << endl;
+
             while(sem_wait(esperarLetra) < 0);
 
-            if(!esLetraIngresada(datosJuego->textos.letrasIngresadas,datosJuego->textos.letra)) {
-                cantCambios = buscarApariciones(datosJuego->textos.palabra,datosJuego->textos.palabraOculta,datosJuego->textos.letra);
+            if(!esLetraIngresada(letrasIngresadas,datosJuego->letraIngresada)) {
+                cantCambios = buscarApariciones(*palabra,datosJuego->palabraOculta,datosJuego->letraIngresada);
 
                 if(cantCambios > 0) {
-                    datosJuego->textos.aciertos += cantCambios;
+                    aciertos += cantCambios;
                 }
                 else {
                     cout << "pierde intento " << endl;
-                    datosJuego->textos.intentos--;
+                    datosJuego->intentos--;
                 }
-                datosJuego->textos.busquedaLetra = cantCambios;
             }
             else {
-                    datosJuego->textos.busquedaLetra = -1;
+                    cantCambios = -1;
             }
+            datosJuego->resultadoBusqueda = cantCambios; 
 
             sem_post(buscarLetra);
+            
+            if(datosJuego->intentos == 0 || aciertos == palabra->size())
+                datosJuego->fin = 1;
+
+            sem_post(verificarFin);  
         }
 
-        if(datosJuego->textos.aciertos == strlen(datosJuego->textos.palabra)) {
-            datosJuego->textos.fin = 1;
+        if(aciertos == palabra->size()) {
+            datosJuego->fin = 1;
         }
         else {
-            datosJuego->textos.fin = -1;
+            datosJuego->fin = -1;
+            strcpy(datosJuego->palabraOculta,palabra->c_str());
         }
 
         sem_post(verificarFin);
@@ -152,34 +167,33 @@ const string* obtenerPalabraDeArchivo() {
     return (const string*)cadena;
 }
 
-int buscarApariciones(const char *palabra,char *palabraOculta,char letra) {
+int buscarApariciones(const string& palabra,char* palabraOculta,char letra) {
     
     int cantIntercambios = 0;
 
-    while(*palabraOculta) {
-        //cout << *palabra << endl;
-        if(*palabra == letra) {
-            *palabraOculta = letra;
-            //cout << *palabraOculta << endl; 
+
+    for (int i = 0; i < palabra.size() ; i++)
+    {
+        if(palabra[i] == letra)
+        {
+            palabraOculta[i] = letra;
             cantIntercambios++;
         }
-        palabra++;
-        palabraOculta++;
+
     }
     
     return cantIntercambios;
 }
 
-bool esLetraIngresada(char* letras,char letraBuscada) {
+bool esLetraIngresada(string& letras,char letraBuscada) {
 
-    while(*letras) {
-        if(*letras == letraBuscada)
+    for(int i = 0; i < letras.size(); i++)
+    {
+        if(letras[i] == letraBuscada)
             return true;
-        letras++;
     }
 
-    *letras = letraBuscada;
-    *(letras+1) = '\0';
+    letras += letraBuscada;
 
     return false;
 }

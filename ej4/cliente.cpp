@@ -33,14 +33,13 @@ int main() {
     sem_t *verificarFin = sem_open("verificarFin", O_CREAT, 0600, 0);
     sem_t *esperarCliente = sem_open("cliente", O_CREAT, 0600, 0);
     sem_t *esperarServidor = sem_open("servidor",O_CREAT,0600,0);
-    //sem_init(juego,1,0);
     
     struct sigaction action;
     action.sa_handler = signalHandler;
 
     sigaction(SIGINT, &action, NULL);   
 
-    datosCompartidos *datosJuego = obtenerDatosCompartidos();
+    memoria *datosJuego = obtenerDatosCompartidos();
     datosJuego->procesos.pidCliente = getpid();
     // int val;
     sem_post(juego);
@@ -49,45 +48,49 @@ int main() {
     sem_wait(esperarServidor);
 
     //while(!datosJuego->textos.fin) {
-    while(datosJuego->textos.intentos > 0 && datosJuego->textos.aciertos < strlen(datosJuego->textos.palabra)) {
+    while(!datosJuego->fin) {
         
         //cout << datosJuego->palabra << endl;
-        cout << "Intentos restantes: " << datosJuego->textos.intentos << endl
-             << datosJuego->textos.palabraOculta << endl;
+        cout << "Intentos restantes: " << datosJuego->intentos << endl
+             << datosJuego->palabraOculta << endl;
         do
         {
             cout << "ingrese una letra: ";
             cin >> letra;
         } while (!validar(letra));
 
-        datosJuego->textos.letra = tolower(letra[0]);
+        datosJuego->letraIngresada = tolower(letra[0]);
+
         sem_post(esperarLetra);
+        
         cout << "esperando validacion... " << endl;
+
         sem_wait(buscarLetra);
 
-        if(datosJuego->textos.busquedaLetra == NO_ENCONTRADA) {
+        if(datosJuego->resultadoBusqueda == NO_ENCONTRADA) {
 
-            cout << "la letra " << "\'" << datosJuego->textos.letra << "\'" << " no se encuentra!\n"
-                    "te quedan " << datosJuego->textos.intentos << " vidas" << endl;
+            cout << "La letra " << "\'" << datosJuego->letraIngresada << "\'" << " no se encuentra!\n"
+                    "Te quedan " << datosJuego->intentos << " vidas" << endl;
             limpiarPantalla();
         }
         else
-            if(datosJuego->textos.busquedaLetra == YA_INGRESADA){
-                cout << "ya ingreso esa letra!" << endl;
+            if(datosJuego->resultadoBusqueda == YA_INGRESADA){
+                cout << "Ya ingreso esa letra!" << endl;
                 limpiarPantalla();
             }
             else {
                 system("clear");
             }
-        //sem_wait(verificarFin);
+
+        sem_wait(verificarFin);
     }
     sem_wait(verificarFin);
 
-    if(datosJuego->textos.fin == GANA) {
+    if(datosJuego->fin == GANA) {
         cout << "Ganaste!" << endl;
     }
     else {
-        cout << "Perdiste!" << endl << "La palabra era " << "\'" << datosJuego->textos.palabra << "\'" << endl;
+        cout << "Perdiste!" << endl << "La palabra era " << "\'" << datosJuego->palabraOculta << "\'" << endl;
     }
 
     sem_post(esperarCliente);
@@ -130,7 +133,7 @@ void signalHandler(int sig) {
 
     sem_t *finalizarPartida = sem_open("finalizacion",O_CREAT,0600,0);
 
-    datosCompartidos* datos = obtenerDatosCompartidos();
+    memoria* datos = obtenerDatosCompartidos();
 
     datos->procesos.pidCliente = -1;
     
