@@ -1,5 +1,5 @@
-#ifndef BIBLIOTECAS_HPP
-#define BIBLIOTECAS_HPP
+#ifndef VALIDACIONES_HPP
+#define VALIDACIONES_HPP
 
 #include <iostream>
 #include <fstream>
@@ -14,10 +14,9 @@
 #include <semaphore.h>
 #include <signal.h>
 
-#include "validaciones.hpp"
 #include "memoria.hpp"
-#include "utilitarios.hpp"
 
-using namespace::std;
+bool validarEjecucionServidor();
+bool seEjecutaCliente();
 
 #endif

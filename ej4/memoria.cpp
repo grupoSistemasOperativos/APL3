@@ -1,10 +1,4 @@
-#include "bibliotecas.hpp"
-
-memoria* obtenerDatosCompartidos();
-bool inicializarMemoria();
-//void inicializarBuffer(bufferCompartido* buffer):
-void inicializarDatos(memoria*,int);
-string inicializar(int);
+#include "memoria.hpp"
 
 bool inicializarMemoria() {
     int idMemoria = shm_open(memoriaCompartida, O_RDWR | O_CREAT | O_EXCL, 0600);
