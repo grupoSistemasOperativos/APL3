@@ -17,11 +17,18 @@ typedef struct {
     char mes[15];
 } datoCliente;
 
+struct stat info;
+
 int main(int argc, char **argv) {
 
     if (argc > 2) {
         cout << "Cantidad de parametros incorrecta. Uso: ./procesoCliente.exe -h" << endl;
         return EXIT_FAILURE;
+    }
+
+    if(argc == 2 && (argv[1] == "-h" || argv[1] == "--help")) {
+        cout << "Ejecute este programa sin ningun parametro y se le va a desplegar un menu con opciones para ejecutar. Para funcionar debe tambien estar ejecutado el procesoServidor" << endl;
+        return EXIT_SUCCESS;
     }
 
     datoCliente dato;
@@ -58,17 +65,21 @@ int main(int argc, char **argv) {
             int fifoServidor = open("fifoServidor", O_RDONLY);
             read(fifoServidor, &totalFacturado, sizeof(totalFacturado));
             close(fifoServidor);
-
-            switch(dato.opcion) {
-                case '1':
-                    cout << "El total facturado en el mes de " << dato.mes << " del año " << dato.anio << " es de: $" << totalFacturado << endl;
-                    break;
-                case '2':
-                    cout << "El total facturado en el año " << dato.anio << " es de: $" << totalFacturado << endl;
-                    break;
-                case '3':
-                    cout << "La media del total facturado del año " << dato.anio << " es de: $" << totalFacturado << endl;
-                    break;
+            
+            if(totalFacturado == -1)
+                cout << "El anio y/o mes ingresado no posee facturacion." << endl;
+            else {
+                switch(dato.opcion) {
+                    case '1':
+                        cout << "El total facturado en el mes de " << dato.mes << " del año " << dato.anio << " es de: $" << totalFacturado << endl;
+                        break;
+                    case '2':
+                        cout << "El total facturado en el año " << dato.anio << " es de: $" << totalFacturado << endl;
+                        break;
+                    case '3':
+                        cout << "La media del total facturado del año " << dato.anio << " es de: $" << totalFacturado << endl;
+                        break;
+                }
             }
         }
 
