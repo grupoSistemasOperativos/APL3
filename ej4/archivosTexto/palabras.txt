@@ -1,0 +1,15 @@
+perro
+gato
+tenis
+futbol
+archivo
+televisor
+maquinola
+pepe
+pepito
+pepote
+computadora
+estufa
+cocina
+microondas
+cafe
