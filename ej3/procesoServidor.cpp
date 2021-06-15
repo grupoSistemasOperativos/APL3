@@ -5,6 +5,7 @@
 #include <experimental/filesystem>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 using namespace std;
@@ -16,6 +17,8 @@ typedef struct {
     char mes[15];
 } datoCliente;
 
+struct stat info;
+
 float obtenerFacturacionArchivo(string rutaArchivo);
 float obtenerFacturacionAnio(int anio, string directorio, bool media);
 
@@ -26,6 +29,18 @@ int main(int argc, char **argv) {
     }
 
     string ruta = argv[1];
+
+    if(ruta == "-h" || ruta == "--help") {
+        cout << "Ejecute este programa pasando como parametro la ruta al directorio que contiene directorios de la facturacion de cada anio." << endl;
+        cout << "Este programa esperara solicitudes de un procesoCliente y le devolvera la informacion requerida." << endl;
+        return EXIT_SUCCESS;
+    }
+
+    if(stat( ruta.c_str(), &info ) != 0 || !(info.st_mode & S_IFDIR)) {
+        cout << ruta << " no es una ruta valida a un directorio" << endl;
+        return EXIT_FAILURE;
+    }
+
     datoCliente dato;
     dato.opcion = 1;
 
@@ -69,7 +84,7 @@ float obtenerFacturacionArchivo(string rutaArchivo) {
 
     if(!archivoFacturacion) {
         cerr << "No se pudo abrir archivo en ruta: " << rutaArchivo << endl;
-        exit(1);
+        return -1;
     }
 
     string linea;
