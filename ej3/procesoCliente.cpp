@@ -26,9 +26,14 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    if(argc == 2 && (argv[1] == "-h" || argv[1] == "--help")) {
-        cout << "Ejecute este programa sin ningun parametro y se le va a desplegar un menu con opciones para ejecutar. Para funcionar debe tambien estar ejecutado el procesoServidor" << endl;
-        return EXIT_SUCCESS;
+    if(argc == 2) {
+        if(argv[1] == "-h" || argv[1] == "--help") {   
+            cout << "Ejecute este programa sin ningun parametro y se le va a desplegar un menu con opciones para ejecutar. Para funcionar debe tambien estar ejecutado el procesoServidor" << endl;
+            return EXIT_SUCCESS;
+        } else {
+            cout << "Cantidad de parametros incorrecta. Uso: ./procesoCliente.exe -h" << endl;            
+            return EXIT_FAILURE;
+        }
     }
 
     datoCliente dato;
