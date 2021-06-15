@@ -121,7 +121,6 @@ int menuAnio(string msj){
         if(!priVez)
            printf("ERROR INGRESE VALORES VALIDOS \n");
         cout << msj << endl;
-        //fflush(stdin);
         scanf("%d",&valor);
         priVez=0;
         cin.ignore();
@@ -139,24 +138,11 @@ char* menuMes(string msj,string opc){
         if(!priVez)
             cout << "ERROR INGRESE VALORES VALIDOS: " << opc << "\n" << endl;
         cout << msj << endl;
-        //fflush(stdin);
         scanf("%s",valor);
         priVez=0;
         valor = strlwr(valor);
         cin.ignore();
-        //valor = strcat(valor, "|");
-        /*cout << valor << endl;
-        valor = strlwr(valor);
-        cout << valor << endl;*/
-        /*char* valorAyuda;
-        valorAyuda = strcpy(valorAyuda, "|");
-        cout << valorAyuda << endl;
-        valor = strcat(valorAyuda, valor);
-        cout << valor << endl;
-        valor = strcat(valor, "|");
-        cout << valor << endl;*/
     } while (!esMesValido(valor));
-    //} while (!esMesValido(valor));
 
     return valor;
 }
