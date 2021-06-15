@@ -7,18 +7,36 @@
 #include <vector>
 #include <string.h>
 
-//void generarHijos(int, vector <int> );
+using namespace std;
+
 int validarParametros(int, char *);
 int mostrarAyuda(int ,char *);
+void generarHijos(int, vector<int>);
 
-using namespace std;
+int main(int argc, char **argv)
+{
+    int numero;
+    if(argc == 1)
+    {
+        cerr << "Error, debe pasar al menos un parametro" << endl;
+        exit(1);
+    }
+    if (mostrarAyuda(argc,argv[1]))
+        exit(1);
+    if (!(numero = validarParametros(argc, argv[1])))
+        exit(1);
+
+    vector<int>padres = {};
+    generarHijos(numero - 1, padres);
+
+    return EXIT_SUCCESS;
+}
+
 void generarHijos(int numero, vector<int> padres)
 {
     if (numero == 0)
     {
-
-        sleep(5);
-
+        sleep(10);
         cout << "Proceso " << getpid() << " Pid: ";
 
         for (size_t i = 0; i < padres.size(); i++)
@@ -50,7 +68,6 @@ void generarHijos(int numero, vector<int> padres)
         generarHijos(numero - 1, padres);
     }
 
-    sleep(10);
     waitpid(hijo1, NULL, 0);
     waitpid(hijo2, NULL, 0);
     cout << "Proceso " << getpid() << " Pid: ";
@@ -65,22 +82,6 @@ void generarHijos(int numero, vector<int> padres)
     kill(getpid(), SIGTERM);
 }
 
-int main(int argc, char **argv)
-{
-    if (mostrarAyuda(argc,argv[1]))
-    exit(0);
-    if (!validarParametros(argc, argv[1]))
-    exit(0);
-
-    
-
-    int numero = atoi(argv[1]);
-    vector<int>padres = {};
-    generarHijos(numero - 1, padres);
-
-    return EXIT_SUCCESS;
-}
-
 int mostrarAyuda(int cantPar,char *cad)
 {
 
@@ -90,7 +91,7 @@ int mostrarAyuda(int cantPar,char *cad)
         cout << "NAME" << endl;
         cout << "    ejercicio1.exe - generar un arbol balanceado y completo de altura [NUMBER]" << endl;
         cout << "SYNOPSIS:" << endl;
-        cout << "    ejercicio1.exe [NUMBER]  NUMBER > 0" << endl;
+        cout << "    ejercicio1.exe [NUMBER]  NUMBER > 1" << endl;
         cout << "DESCRIPTION:" << endl;
         cout << "    Muestra el arbol con altura [NUMBER], lista los pid de los hijos y sus ascendentes" << endl;
         return 1;
@@ -102,7 +103,7 @@ int validarParametros(int cantParam, char *cad)
 {
 
     int numero = atoi(cad);
-    if (cantParam != 2 || numero < 1 )
+    if (cantParam != 2 || numero <= 1 )
     {
         cout << "Error de parametros" << endl;
         cout << "Para mostrar la ayuda : ejercicio1.exe [options]" << endl;
@@ -113,5 +114,5 @@ int validarParametros(int cantParam, char *cad)
     }
 
 
-    return 1;
+    return numero;
 }
