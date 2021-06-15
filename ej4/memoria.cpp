@@ -7,19 +7,15 @@ bool inicializarMemoria() {
         return false;
     }
     ftruncate(idMemoria,sizeof(memoriaCompartida));
-    //close(idMemoria);
+
     return true;
 }
 
 memoria* obtenerDatosCompartidos() {
     
     int idMemoria = shm_open(memoriaCompartida, O_CREAT | O_RDWR, 0600);
-    // cout << idMemoria << endl;
-    // if(idMemoria < 0)
-    //     return NULL;
-    memoria* mem = (memoria*)mmap(NULL, sizeof(memoria), PROT_READ | PROT_WRITE, MAP_SHARED, idMemoria, 0);
 
-    //cout << "verificando si esta vacia " << datos->textos.palabra << " " << datos->textos.palabraOculta << " " << datos->textos.letrasIngresadas << endl;
+    memoria* mem = (memoria*)mmap(NULL, sizeof(memoria), PROT_READ | PROT_WRITE, MAP_SHARED, idMemoria, 0);
 
     close(idMemoria);
     
@@ -28,10 +24,8 @@ memoria* obtenerDatosCompartidos() {
 
 void inicializarDatos(memoria* datos,int largoPalabra) {
     
-    //cout << "hola" << endl;
     memset(datos,'\0',sizeof(memoria));
 
-    //cout << "hola" << endl;
     strcpy(datos->palabraOculta,inicializar(largoPalabra).c_str());
 
     datos->intentos = 6;
@@ -42,7 +36,6 @@ void inicializarDatos(memoria* datos,int largoPalabra) {
 
 void liberarMemoriaCompartida() {
     munmap(obtenerDatosCompartidos(),sizeof(memoria));
-    //shm_unlink(memoriaCompartida);
 }
 
 string inicializar(int cant) {

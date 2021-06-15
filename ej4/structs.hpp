@@ -18,10 +18,4 @@ typedef struct {
     pids procesos;
 }memoria;
 
-// typedef struct {
-//     cadena textos;
-//     pids procesos;
-// }datosCompartidos;
-
-
 #endif
