@@ -47,8 +47,6 @@ int main(int argc, char **argv) {
                 strcpy(dato.mes, menuMes("Ingrese Mes: ", MESES));
                 break;
             case '2':
-                dato.anio = menuAnio("Ingrese Anio: ");
-                break;
             case '3':
                 dato.anio = menuAnio("Ingrese Anio: ");
                 break;
@@ -85,11 +83,16 @@ int main(int argc, char **argv) {
                         cout << "La media del total facturado del año " << dato.anio << " es de: $" << totalFacturado << endl;
                         break;
                 }
+                cin.clear();
             }
+            do {
+                cout << "Presione enter para continuar..." << endl;
+            }while(cin.get()!='\n');
+
+            system("clear");
         }
 
         cin.clear();
-        //cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     } while (dato.opcion != '4');
 
@@ -102,11 +105,12 @@ char menuChar(string msj,string opc){
 
     do{
         if(!priVez)
-           printf("ERROR INGRESE VALORES VALIDOS \n");
+           printf("ERROR INGRESE VALORES VALIDOS\n");
         cout << msj << endl;
         //fflush(stdin);
-        scanf("%c",&valor);
+        cin >> valor;
         priVez=0;
+        cin.clear();
         cin.ignore();
     }while(!strchr(opc.c_str(),TO_UPPER(valor)));
 
@@ -119,11 +123,12 @@ int menuAnio(string msj){
 
     do{
         if(!priVez)
-           printf("ERROR INGRESE VALORES VALIDOS \n");
+           printf("ERROR INGRESE VALORES VALIDOS PARA EL ANIO\n");
         cout << msj << endl;
-        scanf("%d",&valor);
+        cin >> valor;
         priVez=0;
-        cin.ignore();
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }while(valor < 1900 || valor > 3000);
 
     return valor;
@@ -136,19 +141,20 @@ char* menuMes(string msj,string opc){
 
     do{
         if(!priVez)
-            cout << "ERROR INGRESE VALORES VALIDOS: " << opc << "\n" << endl;
+            cout << "ERROR INGRESE VALORES VALIDOS: " << "\n" << endl;
         cout << msj << endl;
-        scanf("%s",valor);
+        cin >> valor;
         priVez=0;
         valor = strlwr(valor);
-        cin.ignore();
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     } while (!esMesValido(valor));
 
     return valor;
 }
 
 bool esMesValido(char * mes) {
-    cout << mes << endl;
+    
     if(!strcmp(mes,"enero"))
         return true;
     else if(!strcmp(mes,"febrero"))

@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <filesystem>
+#include <system_error>
 
 using namespace std;
 namespace fs = std::experimental::filesystem;
@@ -53,19 +55,29 @@ int main(int argc, char **argv) {
         float totalFacturado;
         string mes(dato.mes);
         string rutaMes = ruta + "/" + to_string(dato.anio) + "/" + mes + ".txt";
-        switch(dato.opcion) {
-            case '1':
-                totalFacturado = obtenerFacturacionArchivo(rutaMes);
-                break;
-            case '2':
-                totalFacturado = obtenerFacturacionAnio(dato.anio, ruta, false);
-                break;
-            case '3':
-                totalFacturado = obtenerFacturacionAnio(dato.anio, ruta, true);
-                break;
-            case '4':
-                return EXIT_SUCCESS;
+        
+        try
+        {
+            switch(dato.opcion) {
+                case '1':
+                    totalFacturado = obtenerFacturacionArchivo(rutaMes);
+                    break;
+                case '2':
+                    totalFacturado = obtenerFacturacionAnio(dato.anio, ruta, false);
+                    break;
+                case '3':
+                    totalFacturado = obtenerFacturacionAnio(dato.anio, ruta, true);
+                    break;
+                case '4':
+                    return EXIT_SUCCESS;
+            }
         }
+        catch(const exception& e)
+        {
+            cerr << e.what() << endl;
+            totalFacturado = -1;
+        }
+        
 
         if(dato.opcion != '4') {
             mkfifo("fifoServidor", 0666);
@@ -83,8 +95,7 @@ float obtenerFacturacionArchivo(string rutaArchivo) {
     archivoFacturacion.open(rutaArchivo,ios::in);
 
     if(!archivoFacturacion) {
-        cerr << "No se pudo abrir archivo en ruta: " << rutaArchivo << endl;
-        return -1;
+        throw runtime_error("Error: El archivo " + rutaArchivo + " no existe");
     }
 
     string linea;
