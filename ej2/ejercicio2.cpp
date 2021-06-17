@@ -1,9 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <semaphore.h>
 #include <pthread.h>
-#include <time.h>
 #include <chrono>
 
 using namespace std;
