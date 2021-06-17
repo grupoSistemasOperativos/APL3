@@ -96,6 +96,7 @@ int main(int argc, char **argv) {
 
     } while (dato.opcion != '4');
 
+    unlink("fifoCliente");
     return EXIT_SUCCESS;
 }
 
