@@ -69,6 +69,7 @@ int main(int argc, char **argv) {
                     totalFacturado = obtenerFacturacionAnio(dato.anio, ruta, true);
                     break;
                 case '4':
+                    unlink("fifoServidor");
                     return EXIT_SUCCESS;
             }
         }
@@ -87,6 +88,7 @@ int main(int argc, char **argv) {
         }
     } while (dato.opcion != '4');
 
+    unlink("fifoServidor");
     return EXIT_SUCCESS;
 }
 
