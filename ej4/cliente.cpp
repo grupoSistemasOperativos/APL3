@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
     action.sa_handler = signalHandler;
 
     sigaction(SIGINT, &action, NULL);   
+    sigaction(SIGHUP, &action, NULL);
 
     memoria *datosJuego = obtenerDatosCompartidos();
     datosJuego->procesos.pidCliente = getpid();
@@ -124,7 +125,15 @@ void signalHandler(int sig) {
 
     datos->procesos.pidCliente = -1;
 
-    kill(datos->procesos.pidServidor,SIGUSR2);
+    if(sig != SIGHUP)
+    {
+        kill(datos->procesos.pidServidor,SIGUSR2);
+    }
+    else 
+    {
+        cout << endl    << "El servidor finalizó inesperadamente." << endl
+                        << "Finalizando cliente..." << endl;
+    }
     
     liberarMemoriaCompartida();
     

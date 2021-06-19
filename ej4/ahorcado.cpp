@@ -66,6 +66,7 @@ void empezarJuego() {
         
         sigaction(SIGUSR1, &action, NULL);
         sigaction(SIGUSR2, &action,NULL);
+        sigaction(SIGHUP, &action, NULL);
 
         signal(SIGINT,SIG_IGN);
 
@@ -179,6 +180,23 @@ void signalHandler(int sig) {
                 system("clear");
                 sem_unlink("finalizacion");
                 empezarJuego();
+            }
+        break;
+    case    SIGHUP:
+            {
+                pid_t pid = obtenerDatosCompartidos()->procesos.pidCliente;
+                if(pid != -1)
+                {
+                    sem_t *esperarFinalizacion = sem_open("finalizacion",O_CREAT,0600,0);
+                    kill(pid,SIGHUP);
+                    sem_wait(esperarFinalizacion);
+                }
+
+                liberarMemoriaCompartida();
+                liberarSemaforos();
+                shm_unlink(memoriaCompartida);
+
+                kill(getpid(),SIGTERM);
             }
         break;
     }
