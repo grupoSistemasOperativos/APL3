@@ -188,7 +188,7 @@ void signalHandler(int sig) {
                 if(pid != -1)
                 {
                     sem_t *esperarFinalizacion = sem_open("finalizacion",O_CREAT,0600,0);
-                    kill(pid,SIGHUP);
+                    kill(pid,SIGUSR1);
                     sem_wait(esperarFinalizacion);
                 }
 

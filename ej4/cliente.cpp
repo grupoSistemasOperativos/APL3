@@ -41,7 +41,8 @@ int main(int argc, char *argv[]) {
 
     sigaction(SIGINT, &action, NULL);   
     sigaction(SIGHUP, &action, NULL);
-
+    sigaction(SIGUSR1, &action, NULL);
+    
     memoria *datosJuego = obtenerDatosCompartidos();
     datosJuego->procesos.pidCliente = getpid();
 
@@ -125,7 +126,7 @@ void signalHandler(int sig) {
 
     datos->procesos.pidCliente = -1;
 
-    if(sig != SIGHUP)
+    if(sig != SIGUSR1)
     {
         kill(datos->procesos.pidServidor,SIGUSR2);
     }
