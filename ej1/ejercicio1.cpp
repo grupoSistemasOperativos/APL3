@@ -85,7 +85,7 @@ void generarHijos(int numero, vector<int> padres)
 int mostrarAyuda(int cantPar,char *cad)
 {
 
-    if ((!strcmp(cad, "-h") || !strcmp(cad, "--help")) && cantPar == 2 )
+    if (cantPar == 2  && (!strcmp(cad, "-h") || !strcmp(cad, "--help")))
     {
         cout << "HELP" << endl;
         cout << "NAME" << endl;
