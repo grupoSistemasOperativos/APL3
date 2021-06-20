@@ -1,4 +1,4 @@
-#include "bibliotecas.hpp"
+#include "../headers/bibliotecas.hpp"
 
 #define NO_ENCONTRADA 0
 #define YA_INGRESADA -1

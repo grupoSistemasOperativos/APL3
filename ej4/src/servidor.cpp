@@ -1,4 +1,4 @@
-#include "bibliotecas.hpp"
+#include "../headers/bibliotecas.hpp"
 
 void liberarSemaforos();
 void signalHandler(int sig);

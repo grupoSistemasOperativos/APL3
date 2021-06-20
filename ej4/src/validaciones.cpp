@@ -1,4 +1,4 @@
-#include "validaciones.hpp"
+#include "../headers/validaciones.hpp"
 
 bool validarEjecucionServidor() {
  

@@ -1,4 +1,4 @@
-#include "memoria.hpp"
+#include "../headers/memoria.hpp"
 
 bool inicializarMemoria() {
     int idMemoria = shm_open(memoriaCompartida, O_RDWR | O_CREAT | O_EXCL, 0600);
