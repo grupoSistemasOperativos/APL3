@@ -1,4 +1,4 @@
-all: cliente servidor
+all: bin obj cliente servidor 
 
 
 ######### ejecutables #########
@@ -10,23 +10,25 @@ servidor: servidor.o memoria.o utilitarios.o validaciones.o
 
 ###############################
 
-####### archivos objeto #######
-folder:
+bin:
+	mkdir -p bin/
+obj:
 	mkdir -p obj/
 
-cliente.o: folder src/cliente.cpp 
+####### archivos objeto #######
+cliente.o: src/cliente.cpp 
 	g++ -c src/cliente.cpp -o obj/cliente.o
 
-servidor.o: folder src/servidor.cpp
+servidor.o: src/servidor.cpp
 	g++ -c src/servidor.cpp -o obj/servidor.o
 
-validaciones.o: folder src/validaciones.cpp
+validaciones.o: src/validaciones.cpp
 	g++ -c src/validaciones.cpp -o obj/validaciones.o
 
-memoria.o: folder src/memoria.cpp 
+memoria.o: src/memoria.cpp 
 	g++ -c src/memoria.cpp -o obj/memoria.o
 
-utilitarios.o: folder src/utilitarios.cpp
+utilitarios.o: src/utilitarios.cpp
 	g++ -c src/utilitarios.cpp -o obj/utilitarios.o
 
 ###############################
