@@ -17,40 +17,23 @@
 #include <limits>
 #include <vector>
 
+
 using namespace std;
 
-void limpiarPantalla() {
-
-    
-    do 
-    {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Presione enter para continuar... " << endl;
-    } while (cin.get() != '\n');
-
-    system("clear");
-}
-
-bool esLetra(char letra) {
-    return (letra >= 65 && letra <= 90) || (letra >= 97 && letra <= 122);
-}
-
-bool validar(const string& letra) {
-    
-    if(esLetra(letra.front()) && letra.size() == 1)
-        return true;
-
-    cout << "Ingrese una sola letra y que sea valida!" << endl;
-    //limpiarPantalla();
-    
-    return false;
-}
-
+int mostrarAyuda(int cantPar,char *cad);
+int validarParametros(int cantParam, char *cad);
+bool esLetra(char letra);
+bool validar(const string& letra);
 
 
 int main(int argc, char *argv[])
 {
+
+    if (mostrarAyuda(argc,argv[1]))
+        exit(1);
+    if (!(validarParametros(argc, argv[1])))
+        exit(1);
+
     struct sockaddr_in socketConfig;
     memset(&socketConfig, '0', sizeof(socketConfig));
 
@@ -75,16 +58,20 @@ int main(int argc, char *argv[])
     string letra;
 
     // Mientras el juego no haya finalizado:
-    while ((bytesRecibidos = read(socketComunicacion, bufferRead, sizeof(bufferRead) - 1)) > 0){
+    while ((bytesRecibidos = read(socketComunicacion, bufferRead, sizeof(bufferRead) - 1)) > 0 && 
+        strcmp(bufferRead,"1") && strcmp(bufferRead,"0")){
         //// Recibir palabra oculta de servidor y mostrar
         bufferRead[bytesRecibidos] = 0;
-        printf("%s\n", bufferRead);
+        printf("%s \n", bufferRead);
 
         //// Ingresar una letra y validar que sea letra.
         do
         {
             cout << "ingrese una letra: ";
             cin >> letra;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            system("clear");
         } while (!validar(letra));
         //// Enviar letra a servidor
         snprintf(bufferWrite, sizeof(bufferWrite), "%s\r\n", letra.c_str());
@@ -95,11 +82,65 @@ int main(int argc, char *argv[])
         memset(bufferRead, 0, 2000);
 
         //// Recibir respuesta si la letra fue incorrecta, en caso contrario repetir
-        read(socketComunicacion, bufferRead, sizeof(bufferRead) - 1);
+        bytesRecibidos = read(socketComunicacion, bufferRead, sizeof(bufferRead) - 1);
+        bufferRead[bytesRecibidos] = '\0';
         printf("%s\n", bufferRead);
-        
-    }
 
+        write(socketComunicacion, "000", 2);
+    }
+    read(socketComunicacion, bufferRead, sizeof(bufferRead) - 1);
+    printf("%s\n", bufferRead);
+    write(socketComunicacion, bufferWrite, strlen(bufferWrite));
     close(socketComunicacion);
     return EXIT_SUCCESS;
+}
+
+
+int mostrarAyuda(int cantPar,char *cad)
+{
+
+    if (cantPar == 2  && (!strcmp(cad, "-h") || !strcmp(cad, "--help")))
+    {
+        cout << "HELP" << endl;
+        cout << "NAME" << endl;
+        cout << "    Cliente juego de ahorcado" << endl;
+        cout << "SYNOPSIS:" << endl;
+        cout << "    cliente.exe [IP]" << endl;
+        cout << "DESCRIPTION:" << endl;
+        cout << "    Permite conectarse al servidor y jugar el juego del ahorcado" << endl;
+        return 1;
+    }
+    return 0;
+}
+
+int validarParametros(int cantParam, char *cad)
+{
+
+    if (cantParam > 2 )
+    {
+        cout << "Error de parametros" << endl;
+        cout << "Para mostrar la ayuda : cliente.exe [options]" << endl;
+        cout << "options:" << endl;
+        cout << "    -h" << endl;
+        cout << "    --help" << endl;
+        return 0;
+    }
+
+    return 1;
+}
+
+
+bool esLetra(char letra) {
+    return (letra >= 65 && letra <= 90) || (letra >= 97 && letra <= 122);
+}
+
+bool validar(const string& letra) {
+    
+    if(esLetra(letra.front()) && letra.size() == 1)
+        return true;
+
+    cout << "Ingrese una sola letra y que sea valida!" << endl;
+    //limpiarPantalla();
+    
+    return false;
 }
