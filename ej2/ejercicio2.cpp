@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <chrono>
+#include <cstring>
 
 using namespace std;
 using std::chrono::high_resolution_clock;
@@ -21,22 +22,28 @@ typedef struct{
 
 int main(int argc, char **argv) {
 
+    if(argc == 2) {
+        if(!strcmp(argv[1],"-h") || !strcmp(argv[1],"--help")) {
+            cout << "Para ejecutar este programa debe pasar por parametro la cantidad de iteraciones y el nivel de paralelismo." << endl;
+            cout << "Uso: ./ejercicio2.exe cantidadIteraciones nivelParalelismo" << endl;
+            cout << "Ejemplo: ./ejercicio2.exe 1000 4" << endl;
+            return EXIT_SUCCESS;
+        }   
+        else {
+            cout << "Parametro invalido" << endl;
+            return EXIT_FAILURE;
+        }
+    }
+    
     if (argc != 3) {
         cout << "Cantidad de parametros incorrecta. Uso: ./ejercicio2.exe n p o ./ejercicio2.exe -h" << endl;
         return EXIT_FAILURE;
     }
 
-    if(argv[1] == "-h" || argv[1] == "--help") {   
-        cout << "Para ejecutar este programa debe pasar por parametro la cantidad de iteraciones y el nivel de paralelismo." << endl;
-        cout << "Uso: ./ejercicio2.exe cantidadIteraciones nivelParalelismo" << endl;
-        cout << "Ejemplo: ./ejercicio2.exe 1000 4" << endl;
-        return EXIT_SUCCESS;
-    }
-
     int n = atoi(argv[1]);
     int p = atoi(argv[2]);
 
-    if(n < 0) {
+    if(n <= 0) {
         cout << "La cantidad de iteraciones debe ser mayor a cero." << endl;
         return EXIT_FAILURE;
     }
