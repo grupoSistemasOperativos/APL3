@@ -29,11 +29,11 @@ int main(int argc, char **argv) {
     }
 
     if(argc == 2) {
-        if(argv[1] == "-h" || argv[1] == "--help") {   
+        if(!strcmp(argv[1],"-h") || !strcmp(argv[1],"--help")) {   
             mostrarAyuda();
             return EXIT_SUCCESS;
         } else {
-            cout << "Cantidad de parametros incorrecta. Uso: ./procesoCliente.exe -h" << endl;            
+            cout << "Parametro invalido" << endl;            
             return EXIT_FAILURE;
         }
     }
