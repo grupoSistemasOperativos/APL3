@@ -24,6 +24,8 @@ struct stat info;
 float obtenerFacturacionArchivo(string rutaArchivo);
 float obtenerFacturacionAnio(int anio, string directorio, bool media);
 
+int mostrarAyuda();
+
 int main(int argc, char **argv) { 
     if (argc != 2) {
         cout << "Cantidad de parametros incorrecta. Uso: ./procesoServidor.exe -h/directorio" << endl;
@@ -33,8 +35,7 @@ int main(int argc, char **argv) {
     string ruta = argv[1];
 
     if(ruta == "-h" || ruta == "--help") {
-        cout << "Ejecute este programa pasando como parametro la ruta al directorio que contiene directorios de la facturacion de cada anio." << endl;
-        cout << "Este programa esperara solicitudes de un procesoCliente y le devolvera la informacion requerida." << endl;
+        mostrarAyuda();
         return EXIT_SUCCESS;
     }
 
@@ -90,6 +91,18 @@ int main(int argc, char **argv) {
 
     unlink("fifoServidor");
     return EXIT_SUCCESS;
+}
+
+int mostrarAyuda()
+{
+        cout << "HELP" << endl;
+        cout << "NAME" << endl;
+        cout << "    procesoServidor.exe - se encarga de procesar informacion contable." << endl;
+        cout << "SYNOPSIS:" << endl;
+        cout << "    procesoServidor.exe [DIRECTORIO]" << endl;
+        cout << "DESCRIPTION:" << endl;
+        cout << "    Se ejecutara y esperara a un procesoCliente a que solicite informacion, una vez solicitada, procesara y devolvera lo pedido." << endl;
+    return 0;
 }
 
 float obtenerFacturacionArchivo(string rutaArchivo) {
