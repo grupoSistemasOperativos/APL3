@@ -19,6 +19,8 @@ typedef struct {
 
 struct stat info;
 
+int mostrarAyuda();
+
 int main(int argc, char **argv) {
 
     if (argc > 2) {
@@ -28,7 +30,7 @@ int main(int argc, char **argv) {
 
     if(argc == 2) {
         if(argv[1] == "-h" || argv[1] == "--help") {   
-            cout << "Ejecute este programa sin ningun parametro y se le va a desplegar un menu con opciones para ejecutar. Para funcionar debe tambien estar ejecutado el procesoServidor" << endl;
+            mostrarAyuda();
             return EXIT_SUCCESS;
         } else {
             cout << "Cantidad de parametros incorrecta. Uso: ./procesoCliente.exe -h" << endl;            
@@ -98,6 +100,18 @@ int main(int argc, char **argv) {
 
     unlink("fifoCliente");
     return EXIT_SUCCESS;
+}
+
+int mostrarAyuda()
+{
+        cout << "HELP" << endl;
+        cout << "NAME" << endl;
+        cout << "    procesoCliente.exe - brinda informacion contable." << endl;
+        cout << "SYNOPSIS:" << endl;
+        cout << "    procesoCliente.exe" << endl;
+        cout << "DESCRIPTION:" << endl;
+        cout << "    Se desplegara un menu donde podra solicitar distinto tipo de informacion sobre facturaciones respecto a mes y/o anio." << endl;
+    return 0;
 }
 
 char menuChar(string msj,string opc){
