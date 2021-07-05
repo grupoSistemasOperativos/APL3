@@ -159,8 +159,8 @@ void signalHandler(int sig) {
                     }
                     else {
                         cout << "Cerrando servidor..." << endl;
-                        liberarMemoriaCompartida();
                         liberarSemaforos();
+                        liberarMemoriaCompartida();
                         shm_unlink(memoriaCompartida);
                         kill(getpid(),SIGTERM);
                     }
@@ -203,7 +203,7 @@ void signalHandler(int sig) {
 }
 
 void liberarSemaforos() {
-    sem_unlink("finalizacion");
+
     sem_unlink("cliente");
     sem_unlink("servidor");
 }
