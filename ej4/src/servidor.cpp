@@ -95,7 +95,6 @@ void empezarJuego() {
         sem_wait(cliente);
         sem_post(servidor);
 
-        system("clear");
 
         cout << "Iniciando juego con palabra: " << palabra << endl;
 
@@ -144,7 +143,6 @@ void empezarJuego() {
         liberarMemoriaCompartida();
         shm_unlink(memoriaCompartida);
 
-        system("clear");
     }
 }
 
@@ -177,7 +175,6 @@ void signalHandler(int sig) {
                 liberarMemoriaCompartida();
                 shm_unlink(memoriaCompartida);
 
-                system("clear");
                 empezarJuego();
             }
         break;

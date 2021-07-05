@@ -78,6 +78,4 @@ void limpiarPantalla() {
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Presione enter para continuar... " << endl;
     } while (cin.get() != '\n');
-
-    system("clear");
 }

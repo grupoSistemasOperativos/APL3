@@ -79,9 +79,6 @@ int main(int argc, char *argv[]) {
                 cout << "Ya ingreso esa letra!" << endl;
                 limpiarPantalla();
             }
-            else {
-                system("clear");
-            }
 
         sem_wait(servidor);
     }
