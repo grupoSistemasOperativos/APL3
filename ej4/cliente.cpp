@@ -94,10 +94,10 @@ int main(int argc, char *argv[]) {
         cout << "Perdiste!" << endl << "La palabra era " << "\'" << datosJuego->palabraOculta << "\'" << endl;
     }
 
-    sem_post(cliente);
-
     datosJuego->procesos.pidCliente = -1;
     liberarMemoriaCompartida();
+
+    sem_post(cliente);
 
     return 0;
 }

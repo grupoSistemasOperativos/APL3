@@ -143,8 +143,10 @@ void empezarJuego() {
         liberarSemaforos();
         liberarMemoriaCompartida();
         shm_unlink(memoriaCompartida);
+        //if(errno != 0)
+        //    cout << "error eliminando memoria" << endl;
 
-        system("clear");
+        //system("clear");
     }
 }
 
@@ -159,8 +161,8 @@ void signalHandler(int sig) {
                     }
                     else {
                         cout << "Cerrando servidor..." << endl;
-                        liberarMemoriaCompartida();
                         liberarSemaforos();
+                        liberarMemoriaCompartida();
                         shm_unlink(memoriaCompartida);
                         kill(getpid(),SIGTERM);
                     }
@@ -177,7 +179,7 @@ void signalHandler(int sig) {
                 liberarMemoriaCompartida();
                 shm_unlink(memoriaCompartida);
 
-                system("clear");
+                //system("clear");
                 sem_unlink("finalizacion");
                 empezarJuego();
             }
@@ -203,7 +205,7 @@ void signalHandler(int sig) {
 }
 
 void liberarSemaforos() {
-    sem_unlink("finalizacion");
+    //cout << sem_unlink("finalizacion") << endl;
     sem_unlink("cliente");
     sem_unlink("servidor");
 }
