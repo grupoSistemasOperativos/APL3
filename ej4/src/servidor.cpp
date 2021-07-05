@@ -178,7 +178,6 @@ void signalHandler(int sig) {
                 shm_unlink(memoriaCompartida);
 
                 system("clear");
-                sem_unlink("finalizacion");
                 empezarJuego();
             }
         break;
@@ -204,6 +203,7 @@ void signalHandler(int sig) {
 
 void liberarSemaforos() {
 
+    sem_unlink("finalizacion");
     sem_unlink("cliente");
     sem_unlink("servidor");
 }
