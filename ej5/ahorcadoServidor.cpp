@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <limits>
 #include <vector>
+#include <signal.h>
 
 using namespace std;
 
@@ -40,6 +41,7 @@ int main(int argc, char **argv)
     struct sockaddr_in serverConfig;
     memset(&serverConfig, '0', sizeof(serverConfig));
 
+    signal(SIGINT,SIG_IGN);
     serverConfig.sin_family = AF_INET; // 127.0.0.1
     serverConfig.sin_addr.s_addr = htonl(INADDR_ANY);
     serverConfig.sin_port = htons(5000); // Mayor 1023
